@@ -55,20 +55,49 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] Image imageSelected;
     [SerializeField] Button ButtonToSell;
 
+    [Header("UI Store")]
+    [SerializeField] GameObject MenuStore;
+    [SerializeField] Button ButtonStore;
+    [SerializeField] Button BuyHood;
+    [SerializeField] Button BuyShirt;
+    [SerializeField] Button BuyPants;
+    [SerializeField] Button SellItens;
+
+
+
     List<Clothes> ShopOpened = new List<Clothes>();
 
     private void Start()
     {
-        buttonShop.onClick.RemoveAllListeners();
-        buttonShop.onClick.AddListener(() => OpenShop());
+        ButtonStore.onClick.RemoveAllListeners();
+        ButtonStore.onClick.AddListener(() => OpenMenuStore());
+      
 
         buttonInventory.onClick.RemoveAllListeners();
         buttonInventory.onClick.AddListener(() => OpenInventory());
 
 
-        buttonSell.onClick.RemoveAllListeners();
-        buttonSell.onClick.AddListener(() => OpenSeller());
     }
+
+
+    public void OpenMenuStore()
+    {
+        MenuStore.SetActive(true);
+
+        BuyHood.onClick.RemoveAllListeners();
+        BuyHood.onClick.AddListener(() => OpenShop(clotheType.Hood));
+
+        BuyShirt.onClick.RemoveAllListeners();
+        BuyShirt.onClick.AddListener(() => OpenShop(clotheType.Body));
+
+        BuyPants.onClick.RemoveAllListeners();
+        BuyPants.onClick.AddListener(() => OpenShop(clotheType.Legs));
+
+        SellItens.onClick.RemoveAllListeners();
+        SellItens.onClick.AddListener(() => OpenSeller());
+
+    }
+
     public void ChangeSpriteEquipped(Image equipment, Clothes item)
     {
         equipment.sprite = item.iconImage;
@@ -101,14 +130,16 @@ public class UIManager : Singleton<UIManager>
 
     public void OpenSeller()
     {
-        //CloseShop();
-        //CloseInventory();
+ 
         Seller.SetActive(true);
         buttonSell.onClick.RemoveAllListeners();
         buttonSell.onClick.AddListener(() => CloseSeller());
         InventoryToSell(PlayerData.Instance.personalItens);
         ButtonToSell.onClick.RemoveAllListeners();
         ButtonToSell.onClick.AddListener(() => SellingItem(selectedItemToSell));
+        CloseShop();
+        CloseInventory();
+        MenuStore.SetActive(false);
     }
 
     public void CloseSeller()
@@ -187,20 +218,27 @@ public class UIManager : Singleton<UIManager>
 
     #region Buying System
 
-    public void OpenShop()
+    public void OpenShop(clotheType type)
     {
+
+        selectedItem.gameObject.SetActive(false);
+        nameItem.text = " ";
+        priceItem.text = " ";
+
         CloseInventory();
         CloseSeller();
         UIShopping.SetActive(true);
         buttonShop.onClick.RemoveAllListeners();
         buttonShop.onClick.AddListener(() => CloseShop());
-        PopulateShoppingItens(clotheType.Hood);
+        PopulateShoppingItens(type);
+        MenuStore.SetActive(false);
+
     }
     public void CloseShop()
     {
         UIShopping.SetActive(false);
-        buttonShop.onClick.RemoveAllListeners();
-        buttonShop.onClick.AddListener(() => OpenShop());
+       // buttonShop.onClick.RemoveAllListeners();
+       // buttonShop.onClick.AddListener(() => OpenShop());
 
     }
 
@@ -241,6 +279,7 @@ public class UIManager : Singleton<UIManager>
 
     public void SelecingItem(Clothes item)
     {
+        selectedItem.gameObject.SetActive(true);
         selectedClothe = item;
         selectedItem.sprite = item.iconImage;
         nameItem.text = item.name;
@@ -298,7 +337,7 @@ public class UIManager : Singleton<UIManager>
                 child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().sprite = PlayerData.Instance.personalItens[indexOfInventory].iconImage;
                 child.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
                 int reference = indexOfInventory;
-                child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => InventoryToEquip(PlayerData.Instance.personalItens[reference], child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().gameObject));
+                child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => InventoryToEquip(PlayerData.Instance.personalItens[reference]));
                // child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false));
                 //  child.transform.GetChild(0).GetComponent<Button>().onClick.  colocar função para alterar o objeto em questão
             }
@@ -316,9 +355,9 @@ public class UIManager : Singleton<UIManager>
 
     }
 
-    public void InventoryToEquip(Clothes item, GameObject obj)
+    public void InventoryToEquip(Clothes item)
     {
-        obj.SetActive(false);
+        
         UnequipingItem(item);
 
         EquipingItem(item);
