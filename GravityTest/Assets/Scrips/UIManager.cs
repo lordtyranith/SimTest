@@ -41,7 +41,9 @@ public class UIManager : Singleton<UIManager>
     public Image HoodEquipped;
     public Image BodyEquipped;
     public Image LegsEquipped;
-
+    public Image HoodEquippedCharacter;
+    public Image BodyEquippedCharacter;
+    public Image LegsEquippedCharacter;
 
 
     List<Clothes> ShopOpened = new List<Clothes>();
@@ -179,6 +181,7 @@ public class UIManager : Singleton<UIManager>
         foreach (Transform child in GridItens.transform)
         {
             childsGridItens.Add(child.gameObject);
+
         }
 
         int numberOfChilds = GridItens.transform.childCount;
@@ -189,15 +192,18 @@ public class UIManager : Singleton<UIManager>
         {
             if (indexOfInventory < numberOfItens)
             {
+                child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(true);
                 child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().sprite = clothesList[indexOfInventory].iconImage;
                 child.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
                 int reference = indexOfInventory;
                 child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => InventoryToEquip(clothesList[reference]));
+                child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false));
                 //  child.transform.GetChild(0).GetComponent<Button>().onClick.  colocar função para alterar o objeto em questão
             }
             else
             {
                 child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false);
+                child.transform.GetChild(0).GetComponent<Button>().interactable= false; 
             }
 
             indexOfInventory++;
@@ -206,13 +212,12 @@ public class UIManager : Singleton<UIManager>
 
 
 
-
-
     }
 
     public void InventoryToEquip(Clothes item)
     {
         UnequipingItem(item);
+
         EquipingItem(item);
 
         PopulateInventoryItens(PlayerData.Instance.personalItens);
@@ -222,7 +227,7 @@ public class UIManager : Singleton<UIManager>
     {
 
         clotheType typeItem = item.part;
-
+        int indexOf = 0;
         foreach (Clothes equip in PlayerData.Instance.personalItens)
         {
             if (equip.name == item.name)
@@ -233,25 +238,38 @@ public class UIManager : Singleton<UIManager>
                     case clotheType.Hood:
                         PlayerData.Instance.ChangeHood(item);
                         Console.WriteLine("Você escolheu o número 1.");
+                        HoodEquipped.gameObject.SetActive(true);
+                        HoodEquippedCharacter.sprite = item.ingameImage;
+
+
                         break;
 
                     case clotheType.Body:
                         PlayerData.Instance.ChangeBody(item);
                         Console.WriteLine("Você escolheu o número 2.");
+                        BodyEquipped.gameObject.SetActive(true);
+                        BodyEquippedCharacter.sprite = item.ingameImage;
+
+
                         break;
 
                     case clotheType.Legs:
                         PlayerData.Instance.ChangeLegs(item);
                         Console.WriteLine("Você escolheu o número 3.");
+                        LegsEquipped.gameObject.SetActive(true);
+                        LegsEquippedCharacter.sprite = item.ingameImage;
+
+
                         break;
 
                 }
 
 
-                PlayerData.Instance.personalItens.Remove(equip);
+               // PlayerData.Instance.personalItens.RemoveAt(indexOf);
                 return;
 
             }
+            indexOf++;
         }
     }
 
@@ -264,25 +282,33 @@ public class UIManager : Singleton<UIManager>
         {
             case clotheType.Hood:
                 itemRemoved = PlayerData.Instance.HatRole;
-                PlayerData.Instance.personalItens.Add(itemRemoved);
+                PlayerData.Instance.AddNewItem(itemRemoved);
+                //PlayerData.Instance.RemoveItem(item);               
                 PlayerData.Instance.HatRole = null;
-                Console.WriteLine("Removendo item");
+                Console.WriteLine(itemRemoved.name + "saiu");
+                Console.WriteLine(item.name + "entrou");
+                HoodEquipped.gameObject.SetActive(false);
                 break;
 
             case clotheType.Body:
                 itemRemoved = PlayerData.Instance.BodyRole;
-                PlayerData.Instance.personalItens.Add(itemRemoved);
+                PlayerData.Instance.AddNewItem(itemRemoved);
+               // PlayerData.Instance.RemoveItem(item);
 
                 PlayerData.Instance.BodyRole = null;
+                BodyEquipped.gameObject.SetActive(false);
 
                 Console.WriteLine("Removendo item");
                 break;
 
             case clotheType.Legs:
                 itemRemoved = PlayerData.Instance.LegRole;
-                PlayerData.Instance.personalItens.Add(itemRemoved);
+                PlayerData.Instance.AddNewItem(itemRemoved);
+               // PlayerData.Instance.RemoveItem(item);
                 PlayerData.Instance.LegRole = null;
                 Console.WriteLine("Removendo item");
+                LegsEquipped.gameObject.SetActive(false);
+
                 break;
 
 
