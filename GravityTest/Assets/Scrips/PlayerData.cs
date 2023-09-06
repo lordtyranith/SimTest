@@ -6,12 +6,42 @@ public class PlayerData : Singleton<PlayerData>
 {
     public float playerMoney;
 
-    [SerializeField] List<Clothes> personalItens= new List<Clothes>();
+    [Header("Inventory")]
+    public List<Clothes> personalItens= new List<Clothes>();
+
+    [Header("Using Itens")]
+    public Clothes HatRole;
+    public Clothes BodyRole;
+    public Clothes LegRole;
+
 
 
     private void Start()
     {
         
+    }
+
+    public void ChangeHood(Clothes item)
+    {
+        HatRole = item;
+        UIManager.Instance.ChangeSpriteEquipped(UIManager.Instance.HoodEquipped, item);
+
+
+
+    }
+    public void ChangeBody(Clothes item)
+    {
+
+        BodyRole = item;
+        UIManager.Instance.ChangeSpriteEquipped(UIManager.Instance.BodyEquipped, item);
+
+    }
+    public void ChangeLegs(Clothes item)
+    {
+
+        LegRole = item;
+        UIManager.Instance.ChangeSpriteEquipped(UIManager.Instance.LegsEquipped, item);
+
     }
 
     public float UpdateMoney(float amount)
@@ -25,6 +55,8 @@ public class PlayerData : Singleton<PlayerData>
     {
         personalItens.Add(item);    
     }
+
+
 
 
 }

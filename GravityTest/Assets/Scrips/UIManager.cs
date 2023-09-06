@@ -1,10 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Singleton<UIManager>
 {
     [Header("UI Buttons")]
     [SerializeField] Button buttonInventory;
@@ -33,19 +35,47 @@ public class UIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI msgAlert;
     [SerializeField] Button okButtonAlert;
 
+    [Header("Inventory UI")]
+    [SerializeField] GameObject GridItens;
+    [SerializeField] GameObject InventoryWindow;
+    public Image HoodEquipped;
+    public Image BodyEquipped;
+    public Image LegsEquipped;
 
-    List<Clothes> ShopOpened = new List<Clothes>(); 
+
+
+    List<Clothes> ShopOpened = new List<Clothes>();
 
     private void Start()
     {
         buttonShop.onClick.RemoveAllListeners();
         buttonShop.onClick.AddListener(() => OpenShop());
-        
+
+        buttonInventory.onClick.RemoveAllListeners();
+        buttonInventory.onClick.AddListener(() => OpenInventory());
+    }
+    public void ChangeSpriteEquipped(Image equipment, Clothes item)
+    {
+        equipment.sprite = item.iconImage;
+    }
+    public void OpenInventory()
+    {
+        InventoryWindow.SetActive(true);
+        PopulateInventoryItens(PlayerData.Instance.personalItens);
+        buttonInventory.onClick.RemoveAllListeners();
+        buttonInventory.onClick.AddListener(() => CloseInventory());
+
     }
 
+    public void CloseInventory()
+    {
+        InventoryWindow.SetActive(false);
+        buttonInventory.onClick.RemoveAllListeners();
+        buttonInventory.onClick.AddListener(() => OpenInventory());
+    }
     public void AlertError(string tittle, string message)
     {
-        alertWindow.SetActive(true);   
+        alertWindow.SetActive(true);
         titleAlert.text = tittle;
         msgAlert.text = message;
         okButtonAlert.onClick.RemoveAllListeners();
@@ -75,7 +105,7 @@ public class UIManager : MonoBehaviour
         List<Clothes> ClothesToShop = GameManager.Instance.clothesList.GetItensForCategory(type);
         ShopOpened = ClothesToShop;
 
-        List<Image> imageShop = new List<Image>();  
+        List<Image> imageShop = new List<Image>();
         imageShop.Add(FirstShop); imageShop.Add(SecondShop); imageShop.Add(ThirdShop);
 
         List<Button> buttonShop = new List<Button>();
@@ -87,11 +117,11 @@ public class UIManager : MonoBehaviour
         {
             imageShop[i].sprite = ShopOpened[i].iconImage;
         }
-        int index = 0;  
-        foreach(Clothes item in ShopOpened)
+        int index = 0;
+        foreach (Clothes item in ShopOpened)
         {
             buttonShop[index].onClick.RemoveAllListeners();
-            buttonShop[index].onClick.AddListener(() => SelecingItem(item)); 
+            buttonShop[index].onClick.AddListener(() => SelecingItem(item));
             index++;
         }
 
@@ -110,13 +140,13 @@ public class UIManager : MonoBehaviour
         priceItem.text = item.buyingPrice.ToString();
 
 
-        Debug.Log(item.name);   
+        Debug.Log(item.name);
 
 
     }
     public void BuyingItem()
     {
-        if(selectedClothe.buyingPrice > PlayerData.Instance.playerMoney)
+        if (selectedClothe.buyingPrice > PlayerData.Instance.playerMoney)
         {
             // alert to advice u have no enough money
             AlertError("Warning", "You have no money to do this action");
@@ -124,7 +154,7 @@ public class UIManager : MonoBehaviour
         }
 
         UpdateMoneyUI(-selectedClothe.buyingPrice);
-        PlayerData.Instance.AddNewItem(selectedClothe); 
+        PlayerData.Instance.AddNewItem(selectedClothe);
     }
 
 
@@ -132,11 +162,134 @@ public class UIManager : MonoBehaviour
     public void UpdateMoneyUI(float money)
     {
         float currentMoney = PlayerData.Instance.UpdateMoney(money);
-        moneyDisplay.text = "$" + currentMoney.ToString();    
+        moneyDisplay.text = "$" + currentMoney.ToString();
     }
 
 
 
+    public void PopulateInventoryItens(List<Clothes> clothesList)
+    {
+        // numero de itens na lista
+        // numero de slots válidos
+        // slots - itens na lista
+        // 
+
+        List<GameObject> childsGridItens = new List<GameObject>();
+
+        foreach (Transform child in GridItens.transform)
+        {
+            childsGridItens.Add(child.gameObject);
+        }
+
+        int numberOfChilds = GridItens.transform.childCount;
+        int numberOfItens = clothesList.Count;
+        int indexOfInventory = 0;
+
+        foreach (GameObject child in childsGridItens)
+        {
+            if (indexOfInventory < numberOfItens)
+            {
+                child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().sprite = clothesList[indexOfInventory].iconImage;
+                child.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+                int reference = indexOfInventory;
+                child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => InventoryToEquip(clothesList[reference]));
+                //  child.transform.GetChild(0).GetComponent<Button>().onClick.  colocar função para alterar o objeto em questão
+            }
+            else
+            {
+                child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false);
+            }
+
+            indexOfInventory++;
+
+        }
 
 
+
+
+
+    }
+
+    public void InventoryToEquip(Clothes item)
+    {
+        UnequipingItem(item);
+        EquipingItem(item);
+
+        PopulateInventoryItens(PlayerData.Instance.personalItens);
+    }
+
+    public void EquipingItem(Clothes item)
+    {
+
+        clotheType typeItem = item.part;
+
+        foreach (Clothes equip in PlayerData.Instance.personalItens)
+        {
+            if (equip.name == item.name)
+            {
+
+                switch (typeItem)
+                {
+                    case clotheType.Hood:
+                        PlayerData.Instance.ChangeHood(item);
+                        Console.WriteLine("Você escolheu o número 1.");
+                        break;
+
+                    case clotheType.Body:
+                        PlayerData.Instance.ChangeBody(item);
+                        Console.WriteLine("Você escolheu o número 2.");
+                        break;
+
+                    case clotheType.Legs:
+                        PlayerData.Instance.ChangeLegs(item);
+                        Console.WriteLine("Você escolheu o número 3.");
+                        break;
+
+                }
+
+
+                PlayerData.Instance.personalItens.Remove(equip);
+                return;
+
+            }
+        }
+    }
+
+    public void UnequipingItem(Clothes item)
+    {
+        clotheType typeItem = item.part;
+        Clothes itemRemoved;
+
+        switch (typeItem)
+        {
+            case clotheType.Hood:
+                itemRemoved = PlayerData.Instance.HatRole;
+                PlayerData.Instance.personalItens.Add(itemRemoved);
+                PlayerData.Instance.HatRole = null;
+                Console.WriteLine("Removendo item");
+                break;
+
+            case clotheType.Body:
+                itemRemoved = PlayerData.Instance.BodyRole;
+                PlayerData.Instance.personalItens.Add(itemRemoved);
+
+                PlayerData.Instance.BodyRole = null;
+
+                Console.WriteLine("Removendo item");
+                break;
+
+            case clotheType.Legs:
+                itemRemoved = PlayerData.Instance.LegRole;
+                PlayerData.Instance.personalItens.Add(itemRemoved);
+                PlayerData.Instance.LegRole = null;
+                Console.WriteLine("Removendo item");
+                break;
+
+
+        }
+
+
+
+
+    }
 }
