@@ -30,7 +30,22 @@ public class PlayerController : MonoBehaviour
         {
             _playerAnim.SetInteger("Moviment", 0);
         }
+        Flip();
     }
+
+    void Flip()
+    {
+        if(_playerPosition.x > 0)
+        {
+            transform.eulerAngles = new Vector2(0f, 0f);
+        }
+        else if (_playerPosition.x < 0)
+        {
+            transform.eulerAngles = new Vector2(0f, 180f);
+
+        }
+    }
+
     private void FixedUpdate()
     {
         _rb2d.MovePosition(_rb2d.position + _playerPosition * _playerSpeed * Time.fixedDeltaTime);
