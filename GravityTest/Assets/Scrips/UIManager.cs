@@ -11,6 +11,7 @@ public class UIManager : Singleton<UIManager>
     [Header("UI Buttons")]
     [SerializeField] Button buttonInventory;
     [SerializeField] Button buttonShop;
+    [SerializeField] Button buttonSell;
 
     [Header("Money")]
     [SerializeField] TextMeshProUGUI moneyDisplay;
@@ -45,6 +46,14 @@ public class UIManager : Singleton<UIManager>
     public Image BodyEquippedCharacter;
     public Image LegsEquippedCharacter;
 
+    [Header("Selling System")]
+    Clothes selectedItemToSell;
+    [SerializeField] GameObject Seller;
+    [SerializeField] GameObject GridSeller;
+    [SerializeField] TextMeshProUGUI nameSelectedToSell;
+    [SerializeField] TextMeshProUGUI priceToSell;
+    [SerializeField] Image imageSelected;
+    [SerializeField] Button ButtonToSell;
 
     List<Clothes> ShopOpened = new List<Clothes>();
 
@@ -55,6 +64,10 @@ public class UIManager : Singleton<UIManager>
 
         buttonInventory.onClick.RemoveAllListeners();
         buttonInventory.onClick.AddListener(() => OpenInventory());
+
+
+        buttonSell.onClick.RemoveAllListeners();
+        buttonSell.onClick.AddListener(() => OpenSeller());
     }
     public void ChangeSpriteEquipped(Image equipment, Clothes item)
     {
@@ -62,6 +75,8 @@ public class UIManager : Singleton<UIManager>
     }
     public void OpenInventory()
     {
+        CloseShop();
+        CloseSeller();
         InventoryWindow.SetActive(true);
         PopulateInventoryItens(PlayerData.Instance.personalItens);
         buttonInventory.onClick.RemoveAllListeners();
@@ -84,8 +99,98 @@ public class UIManager : Singleton<UIManager>
         okButtonAlert.onClick.AddListener(() => alertWindow.gameObject.SetActive(false));
     }
 
+    public void OpenSeller()
+    {
+        //CloseShop();
+        //CloseInventory();
+        Seller.SetActive(true);
+        buttonSell.onClick.RemoveAllListeners();
+        buttonSell.onClick.AddListener(() => CloseSeller());
+        InventoryToSell(PlayerData.Instance.personalItens);
+        ButtonToSell.onClick.RemoveAllListeners();
+        ButtonToSell.onClick.AddListener(() => SellingItem(selectedItemToSell));
+    }
+
+    public void CloseSeller()
+    {
+        Seller.SetActive(false);
+        buttonSell.onClick.RemoveAllListeners();
+        buttonSell.onClick.AddListener(() => OpenSeller());
+    }
+
+    public void InventoryToSell(List<Clothes> clothesList)
+    {
+
+        List<GameObject> childsGridItens = new List<GameObject>();
+
+        foreach (Transform child in GridSeller.transform)
+        {
+            childsGridItens.Add(child.gameObject);
+
+        }
+
+        int numberOfChilds = GridSeller.transform.childCount;
+        int numberOfItens = clothesList.Count;
+        int indexOfInventory = 0;
+
+        foreach (GameObject child in childsGridItens)
+        {
+            if (indexOfInventory < numberOfItens)
+            {
+                child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(true);
+                child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().sprite = clothesList[indexOfInventory].iconImage;
+                child.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+                int reference = indexOfInventory;
+                child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => SelectionToSell(clothesList[reference]));
+               // child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false));
+                //  child.transform.GetChild(0).GetComponent<Button>().onClick.  colocar função para alterar o objeto em questão
+            }
+            else
+            {
+                child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false);
+                child.transform.GetChild(0).GetComponent<Button>().interactable = false;
+            }
+
+            indexOfInventory++;
+
+        }
+
+    }
+
+    public void SelectionToSell(Clothes item)
+    {
+        imageSelected.gameObject.SetActive(true);
+
+        selectedItemToSell = item;
+        imageSelected.sprite = item.iconImage;
+        nameSelectedToSell.text = item.name;
+        priceToSell.text = item.sellingPrice.ToString();
+    }
+
+    public void SellingItem(Clothes item)
+    {
+        PlayerData.Instance.RemoveItem(item);
+
+        UpdateMoneyUI(item.sellingPrice);
+
+        nameSelectedToSell.text = " ";
+        priceToSell.text = " ";
+
+        imageSelected.gameObject.SetActive(false);
+        selectedItemToSell = null;
+        InventoryToSell(PlayerData.Instance.personalItens);
+
+
+
+
+    }
+
+    #region Buying System
+
     public void OpenShop()
     {
+        CloseInventory();
+        CloseSeller();
         UIShopping.SetActive(true);
         buttonShop.onClick.RemoveAllListeners();
         buttonShop.onClick.AddListener(() => CloseShop());
@@ -167,15 +272,12 @@ public class UIManager : Singleton<UIManager>
         moneyDisplay.text = "$" + currentMoney.ToString();
     }
 
+    #endregion
 
-
+    #region Inventory System
     public void PopulateInventoryItens(List<Clothes> clothesList)
     {
-        // numero de itens na lista
-        // numero de slots válidos
-        // slots - itens na lista
-        // 
-
+        
         List<GameObject> childsGridItens = new List<GameObject>();
 
         foreach (Transform child in GridItens.transform)
@@ -185,25 +287,25 @@ public class UIManager : Singleton<UIManager>
         }
 
         int numberOfChilds = GridItens.transform.childCount;
-        int numberOfItens = clothesList.Count;
+       // int numberOfItens = clothesList.Count;
         int indexOfInventory = 0;
 
         foreach (GameObject child in childsGridItens)
         {
-            if (indexOfInventory < numberOfItens)
+            if (indexOfInventory < PlayerData.Instance.personalItens.Count)
             {
                 child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(true);
-                child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().sprite = clothesList[indexOfInventory].iconImage;
+                child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().sprite = PlayerData.Instance.personalItens[indexOfInventory].iconImage;
                 child.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
                 int reference = indexOfInventory;
-                child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => InventoryToEquip(clothesList[reference]));
-                child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false));
+                child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => InventoryToEquip(PlayerData.Instance.personalItens[reference], child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Image>().gameObject));
+               // child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false));
                 //  child.transform.GetChild(0).GetComponent<Button>().onClick.  colocar função para alterar o objeto em questão
             }
             else
             {
                 child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false);
-                child.transform.GetChild(0).GetComponent<Button>().interactable= false; 
+              //  child.transform.GetChild(0).GetComponent<Button>().interactable= false; 
             }
 
             indexOfInventory++;
@@ -214,13 +316,16 @@ public class UIManager : Singleton<UIManager>
 
     }
 
-    public void InventoryToEquip(Clothes item)
+    public void InventoryToEquip(Clothes item, GameObject obj)
     {
+        obj.SetActive(false);
         UnequipingItem(item);
 
         EquipingItem(item);
 
         PopulateInventoryItens(PlayerData.Instance.personalItens);
+
+
     }
 
     public void EquipingItem(Clothes item)
@@ -318,4 +423,5 @@ public class UIManager : Singleton<UIManager>
 
 
     }
+    #endregion
 }
