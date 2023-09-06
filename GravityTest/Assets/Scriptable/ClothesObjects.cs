@@ -31,7 +31,7 @@ public class ClothesObjects : ScriptableObject
   
     public List<Clothes> clothes;
 
-    public List<Clothes> PegarItensPorCategoria(clotheType category)
+    public List<Clothes> GetItensForCategory(clotheType category)
     {
         return clothes.Where(X => X.part == category).ToList();
     }

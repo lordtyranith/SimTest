@@ -6,7 +6,9 @@ public class GameManager : Singleton<GameManager>
 {
     
     public ClothesObjects clothesList;
+   
 
 
+    
 
 }

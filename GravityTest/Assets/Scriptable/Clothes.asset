@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: Clothes
   m_EditorClassIdentifier: 
   clothes:
-  - name: NoHood
+  - name: Blue Hood
     part: 0
-    buyingPrice: 0
-    sellingPrice: 0
-    description: Its no hood
-    iconImage: {fileID: 21300000, guid: 04f6c40e52535b941b42e11550f9cb8c, type: 3}
-    ingameImage: {fileID: 21300000, guid: 04f6c40e52535b941b42e11550f9cb8c, type: 3}
+    buyingPrice: 21
+    sellingPrice: 15
+    description: A blue hood
+    iconImage: {fileID: 21300000, guid: ae2d3e3bacfacde4981510b116293dba, type: 3}
+    ingameImage: {fileID: 21300000, guid: ae2d3e3bacfacde4981510b116293dba, type: 3}
   - name: Yellow Hood
     part: 0
-    buyingPrice: 20
+    buyingPrice: 22
     sellingPrice: 15
     description: Its a yellow hood
     iconImage: {fileID: 21300000, guid: f7e7bed775fff8347b9e53c67e20875f, type: 3}
