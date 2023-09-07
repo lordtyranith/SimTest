@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 using UnityEngine.UI;
 
 public class UIManager : Singleton<UIManager>
@@ -70,7 +71,11 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] Button BuyPants;
     [SerializeField] Button SellItens;
 
+    [Header("Sounds System")]
+    [SerializeField] Button MuteOrNot;
 
+    [SerializeField] RectTransform referenceHood;
+    [SerializeField] RectTransform referenceItem;
 
     List<Clothes> ShopOpened = new List<Clothes>();
 
@@ -92,11 +97,30 @@ public class UIManager : Singleton<UIManager>
         ButtonLegs.onClick.RemoveAllListeners();
         ButtonLegs.onClick.AddListener(() => UnequipButton(PlayerData.Instance.LegRole, ButtonLegs, LegsEquipped, UnequipedLegs));
 
+        MuteOrNot.onClick.RemoveAllListeners();
+        MuteOrNot.onClick.AddListener(() => MuteAllSounds());
     }
+    public void MuteAllSounds()
+    {
+        SoundClick.Instance.SoundClicking1();
+        MuteOrNot.transform.GetChild(0).gameObject.SetActive(false);
+        SoundClick.Instance.MuteAll();
+        MuteOrNot.onClick.RemoveAllListeners();
+        MuteOrNot.onClick.AddListener(() => UnMuteAllSounds());
+    }
+    public void UnMuteAllSounds()
+    {
+        MuteOrNot.transform.GetChild(0).gameObject.SetActive(true);
+        SoundClick.Instance.UnMuteAll();
+        MuteOrNot.onClick.RemoveAllListeners();
+        MuteOrNot.onClick.AddListener(() => MuteAllSounds());
 
+    }
     #region Function to UI Buttons
     public void OpenMenuStore()
     {
+        SoundClick.Instance.SoundClicking1();
+
         MenuStore.SetActive(true);
 
         BuyHood.onClick.RemoveAllListeners();
@@ -119,17 +143,19 @@ public class UIManager : Singleton<UIManager>
     }
     public void OpenInventory()
     {
+        SoundClick.Instance.SoundClicking1();
         CloseShop();
         CloseSeller();
         InventoryWindow.SetActive(true);
         PopulateInventoryItens(PlayerData.Instance.personalItens);
-        buttonInventory.onClick.RemoveAllListeners();
-        buttonInventory.onClick.AddListener(() => CloseInventory());
+       // buttonInventory.onClick.RemoveAllListeners();
+       // buttonInventory.onClick.AddListener(() => CloseInventory());
 
     }
 
     public void CloseInventory()
     {
+        SoundClick.Instance.SoundClicking2();
         InventoryWindow.SetActive(false);
         buttonInventory.onClick.RemoveAllListeners();
         buttonInventory.onClick.AddListener(() => OpenInventory());
@@ -207,6 +233,7 @@ public class UIManager : Singleton<UIManager>
 
     public void SelectionToSell(Clothes item)
     {
+
         imageSelected.gameObject.SetActive(true);
 
         selectedItemToSell = item;
@@ -217,6 +244,7 @@ public class UIManager : Singleton<UIManager>
 
     public void SellingItem(Clothes item)
     {
+        SoundClick.Instance.SoundClicking2();
         PlayerData.Instance.RemoveItem(item);
 
         UpdateMoneyUI(item.sellingPrice);
@@ -238,6 +266,7 @@ public class UIManager : Singleton<UIManager>
 
     public void OpenShop(clotheType type)
     {
+        
 
         selectedItem.gameObject.SetActive(false);
         nameItem.text = " ";
@@ -254,6 +283,8 @@ public class UIManager : Singleton<UIManager>
     }
     public void CloseShop()
     {
+        
+
         UIShopping.SetActive(false);
        // buttonShop.onClick.RemoveAllListeners();
        // buttonShop.onClick.AddListener(() => OpenShop());
@@ -279,7 +310,22 @@ public class UIManager : Singleton<UIManager>
         for (int i = 0; i < ShopOpened.Count; i++)
         {
             imageShop[i].sprite = ShopOpened[i].iconImage;
+            if (type == clotheType.Hood)
+            {
+                imageShop[i].GetComponent<RectTransform>().anchoredPosition = referenceHood.anchoredPosition;
+                imageShop[i].GetComponent<RectTransform>().localScale = referenceHood.localScale;
+
+            }
+            else
+            {
+                imageShop[i].GetComponent<RectTransform>().anchoredPosition = referenceItem.anchoredPosition;
+                imageShop[i].GetComponent<RectTransform>().localScale = referenceItem.localScale;
+
+            }
+
+
         }
+
         int index = 0;
         foreach (Clothes item in ShopOpened)
         {
@@ -297,6 +343,8 @@ public class UIManager : Singleton<UIManager>
 
     public void SelecingItem(Clothes item)
     {
+        SoundClick.Instance.SoundClicking1();
+
         selectedItem.gameObject.SetActive(true);
         selectedClothe = item;
         selectedItem.sprite = item.iconImage;
@@ -336,7 +384,9 @@ public class UIManager : Singleton<UIManager>
 
     public void UnequipButton(Clothes item, Button bt, Image img, Sprite part)
     {
-        if(item.name.Length < 2)
+        SoundClick.Instance.SoundClicking2();
+
+        if (item.name.Length < 2)
         {
             PlayerData.Instance.UpdatePersonalItens();
             return;
@@ -416,7 +466,19 @@ public class UIManager : Singleton<UIManager>
                 int reference = indexOfInventory;
                 child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => InventoryToEquip(PlayerData.Instance.personalItens[reference]));
                 child.transform.GetChild(0).GetComponent<Button>().interactable = true;
-               // child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false));
+                if(PlayerData.Instance.personalItens[reference].part == clotheType.Hood)
+                {
+                    child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition = referenceHood.anchoredPosition;
+                    child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<RectTransform>().localScale = referenceHood.localScale;
+
+                }
+                else
+                {
+                    child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition = referenceItem.anchoredPosition;
+                    child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<RectTransform>().localScale = referenceItem.localScale;
+
+                }
+                // child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false));
                 //  child.transform.GetChild(0).GetComponent<Button>().onClick.  colocar função para alterar o objeto em questão
             }
             else

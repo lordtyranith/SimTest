@@ -19,6 +19,7 @@ public class CloseWindow : MonoBehaviour
   
     public void CloseObj()
     {
+        SoundClick.Instance.SoundClicking2();
         WindowToClose.SetActive(false);
     }
 }
