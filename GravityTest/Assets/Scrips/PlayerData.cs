@@ -26,7 +26,7 @@ public class PlayerData : Singleton<PlayerData>
         
     }
 
-    public void ChangeHood(Clothes item)
+    public void ChangeHood(Clothes item) 
     {
        if (HatRole != null)
        {
@@ -51,7 +51,7 @@ public class PlayerData : Singleton<PlayerData>
 
     }
 
-    public void UpdatePersonalItens()
+    public void UpdatePersonalItens() // list personalItens is all itens the player keep on inventory
     {
 
         int index = 0;
@@ -65,16 +65,6 @@ public class PlayerData : Singleton<PlayerData>
             index++;
         }
 
-
-
-      // for (int i = 0; i < personalItens.Count; i++)
-      // {
-      //     if (personalItens[i].name.Length < 2)
-      //     {
-      //         personalItens.RemoveAt(i);
-      //         return;
-      //     }
-      // }
     }
     public void ChangeBody(Clothes item)
     {

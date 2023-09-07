@@ -6,7 +6,7 @@ public class GameManager : Singleton<GameManager>
 {
     
     public ClothesObjects clothesList;
-   
+   // i was think its will necessary, but its not.
 
 
     

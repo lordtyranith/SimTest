@@ -137,7 +137,7 @@ public class UIManager : Singleton<UIManager>
 
     }
 
-    public void ChangeSpriteEquipped(Image equipment, Clothes item)
+    public void ChangeSpriteEquipped(Image equipment, Clothes item)  
     {
         equipment.sprite = item.iconImage;
     }
@@ -148,9 +148,6 @@ public class UIManager : Singleton<UIManager>
         CloseSeller();
         InventoryWindow.SetActive(true);
         PopulateInventoryItens(PlayerData.Instance.personalItens);
-       // buttonInventory.onClick.RemoveAllListeners();
-       // buttonInventory.onClick.AddListener(() => CloseInventory());
-
     }
 
     public void CloseInventory()
@@ -171,7 +168,6 @@ public class UIManager : Singleton<UIManager>
 
     public void OpenSeller()
     {
- 
         Seller.SetActive(true);
         buttonSell.onClick.RemoveAllListeners();
         buttonSell.onClick.AddListener(() => CloseSeller());
@@ -218,6 +214,18 @@ public class UIManager : Singleton<UIManager>
                 child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => SelectionToSell(clothesList[reference]));
                 //child.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => child.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.SetActive(false));
                 //  child.transform.GetChild(0).GetComponent<Button>().onClick.  colocar função para alterar o objeto em questão
+                if (PlayerData.Instance.personalItens[reference].part == clotheType.Hood)
+                {
+                    child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition = referenceHood.anchoredPosition;
+                    child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<RectTransform>().localScale = referenceHood.localScale;
+
+                }
+                else
+                {
+                    child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition = referenceItem.anchoredPosition;
+                    child.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<RectTransform>().localScale = referenceItem.localScale;
+
+                }
             }
             else
             {
