@@ -34,42 +34,42 @@ MonoBehaviour:
     description: Its a red hood
     iconImage: {fileID: 21300000, guid: 20eb058aea3c3a744bb5d47a1610550a, type: 3}
     ingameImage: {fileID: 21300000, guid: 20eb058aea3c3a744bb5d47a1610550a, type: 3}
-  - name: Body 1
+  - name: Armor
     part: 2
     buyingPrice: 50
     sellingPrice: 35
     description: Its a normal body part
-    iconImage: {fileID: 21300000, guid: 215dd6c48c732d744aecd29e7fecbbfa, type: 3}
-    ingameImage: {fileID: 21300000, guid: 215dd6c48c732d744aecd29e7fecbbfa, type: 3}
-  - name: Body 2
+    iconImage: {fileID: 21300000, guid: 3d9056df586b6024fbc5b9fee2433eef, type: 3}
+    ingameImage: {fileID: 21300000, guid: 3d9056df586b6024fbc5b9fee2433eef, type: 3}
+  - name: Yellow Shirt
     part: 2
     buyingPrice: 50
     sellingPrice: 35
     description: Its a yellow body part
     iconImage: {fileID: 21300000, guid: 90458a12b047bb84ba77cb7ea81ba457, type: 3}
     ingameImage: {fileID: 21300000, guid: 90458a12b047bb84ba77cb7ea81ba457, type: 3}
-  - name: Body 3
+  - name: Black Shirt
     part: 2
     buyingPrice: 60
     sellingPrice: 40
     description: Its a stealth body part
     iconImage: {fileID: 21300000, guid: 250530d3e9754ed418009e3d539275b3, type: 3}
     ingameImage: {fileID: 21300000, guid: 250530d3e9754ed418009e3d539275b3, type: 3}
-  - name: Normal Leg
+  - name: Blue Pants
     part: 1
     buyingPrice: 25
     sellingPrice: 15
     description: A normal legs
-    iconImage: {fileID: 21300000, guid: c376d5b80d02ffe4ba89fd03d60ec471, type: 3}
-    ingameImage: {fileID: 21300000, guid: c376d5b80d02ffe4ba89fd03d60ec471, type: 3}
-  - name: Yellow Leg
+    iconImage: {fileID: 21300000, guid: f5e38fc0746afdb408f3af29c6c737cc, type: 3}
+    ingameImage: {fileID: 21300000, guid: f5e38fc0746afdb408f3af29c6c737cc, type: 3}
+  - name: Yellow Pants
     part: 1
     buyingPrice: 25
     sellingPrice: 15
     description: A yellow leg
     iconImage: {fileID: 21300000, guid: 27fe921d9d4bdb24eb91cc1e96a04f02, type: 3}
     ingameImage: {fileID: 21300000, guid: 27fe921d9d4bdb24eb91cc1e96a04f02, type: 3}
-  - name: Stealth leg
+  - name: Stealth Pants
     part: 1
     buyingPrice: 30
     sellingPrice: 20
